@@ -28,10 +28,12 @@ const fetchTarget = async () => {
   if (element) {
     const value = await page.evaluate(el => el.textContent, element);
     if (value === 'Sold out') {
+      console.log('Product is Sold out.')
       return;
     }
   }
 
+  console.log('Product is in stock!')
   await triggerAlert();
 }
 
