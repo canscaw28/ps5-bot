@@ -1,0 +1,19 @@
+{
+  "name": "ps5-bot",
+  "version": "1.0.0",
+  "description": "ps5 alerting",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/canscaw28/ps5-bot.git"
+  },
+  "author": "Craig Weiss",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/canscaw28/ps5-bot/issues"
+  },
+  "homepage": "https://github.com/canscaw28/ps5-bot#readme"
+}
