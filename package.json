@@ -19,6 +19,7 @@
   "homepage": "https://github.com/canscaw28/ps5-bot#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "node-cron": "^3.0.0"
+    "node-cron": "^3.0.0",
+    "puppeteer": "^10.1.0"
   }
 }
