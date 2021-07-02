@@ -16,6 +16,9 @@ const twilioClient = twilio(accountSid, authToken);
 const app = express();
 let browser = null;
 
+// Hacky cooldown - so I don't get spammed.
+let cooldown = 0;
+
 const triggerAlert = async () => {
   twilioClient.messages
       .create({body: `PS5 ALERT!!! visit ${targetURL}`, from: twilioPhoneNumber, to: personalPhoneNumber})
@@ -45,6 +48,7 @@ const fetchTarget = async () => {
   }
 
   console.log('Product is in stock!')
+  cooldown = 10;
   await triggerAlert();
 }
 
@@ -53,6 +57,13 @@ cron.schedule('*/30 * * * * *', async () => {
     if (!browser) {
       await setupBrowser();
     }
+
+    // delay consecutive alerting.
+    if (cooldown > 0) {
+      cooldown--;
+      return;
+    }
+
     await fetchTarget();
 });
   
