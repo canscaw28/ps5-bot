@@ -6,7 +6,7 @@ This is a very simple cron that will alert you via sms if a ps5 is in stock. Pup
 ## Considerations
 At the moment the cron only works for Target. It should be simple to add support for alternative retailers.
 
-I was also considering having the bot fill out your credit card information and make the transaction for you. But this honestly seems unnecessary? If the alerting + my human reflexes are not fast enough, I might have to implement this part later. ¯\_(ツ)_/¯ 
+I was also considering having the bot fill out your credit card information and make the transaction for you. But this honestly seems unnecessary? If the alerting + my human reflexes are not fast enough, I might have to implement this part later. ¯\\\_(ツ)\_/¯ 
 
 ## Setup
 intallation
