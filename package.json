@@ -6,6 +6,7 @@
   "scripts": {
     "test": "test"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/canscaw28/ps5-bot.git"
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/canscaw28/ps5-bot#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "node-cron": "^3.0.0"
   }
 }
