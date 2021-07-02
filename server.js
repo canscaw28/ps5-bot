@@ -1,14 +1,25 @@
 import cron from 'node-cron';
 import express from 'express';
 import puppeteer from 'puppeteer';
+import dotenv from 'dotenv';
+import twilio from 'twilio';
+
+dotenv.config();
 
 const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const personalPhoneNumber = process.env.PERSONAL_PHONE_NUMBER;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
+const twilioClient = twilio(accountSid, authToken);
 const app = express();
 let browser = null;
 
 const triggerAlert = async () => {
-  // TODO
+  twilioClient.messages
+      .create({body: `PS5 ALERT!!! visit ${targetURL}`, from: twilioPhoneNumber, to: personalPhoneNumber})
+      .then(message => console.log(message.sid));
 }
 
 const setupBrowser = async () => {

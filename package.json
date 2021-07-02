@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/canscaw28/ps5-bot#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "node-cron": "^3.0.0",
-    "puppeteer": "^10.1.0"
+    "puppeteer": "^10.1.0",
+    "twilio": "^3.65.0"
   }
 }
