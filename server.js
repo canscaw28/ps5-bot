@@ -7,6 +7,10 @@ const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
 const app = express();
 let browser = null;
 
+const triggerAlert = async () => {
+  // TODO
+}
+
 const setupBrowser = async () => {
   console.log('Setting up puppeteer')
   browser = await puppeteer.launch();
@@ -20,8 +24,15 @@ const fetchTarget = async () => {
 
   // Wait for page content to load
   await page.waitForTimeout(3000);
-  const html = await page.evaluate(() => document.querySelector('*').outerHTML);
-  console.log(html)
+  const element = await page.$('[data-test="soldOutBlock"]');
+  if (element) {
+    const value = await page.evaluate(el => el.textContent, element);
+    if (value === 'Sold out') {
+      return;
+    }
+  }
+
+  await triggerAlert();
 }
 
 cron.schedule('*/30 * * * * *', async () => {
