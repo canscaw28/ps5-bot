@@ -9,13 +9,13 @@ At the moment the cron only works for Target. It should be simple to add support
 I was also considering having the bot fill out your credit card information and make the transaction for you. But this honestly seems unnecessary? If the alerting + my human reflexes are not fast enough, I might have to implement this part later. ¯\\\_(ツ)\_/¯ 
 
 ## Setup
-intallation
+installation
 `yarn install`
 
 Create a `.env` file with the following values:
 ```
 TWILIO_AUTH_TOKEN="[Your twilio auth token]"
-TWILIO_ACCOUNT_SID="[your twilio accound sid]"
+TWILIO_ACCOUNT_SID="[your twilio account sid]"
 TWILIO_PHONE_NUMBER="[A designated twilio phone number]"
 PERSONAL_PHONE_NUMBER="[the recipient phone number of the alert]"
 ```
