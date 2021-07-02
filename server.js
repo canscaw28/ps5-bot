@@ -1,14 +1,20 @@
 import cron from 'node-cron';
 import express from 'express';
 import puppeteer from 'puppeteer';
-  
-const app = express();
 
 const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
 
-// Hacky Target Alert
+const app = express();
+let browser = null;
+
 const setupBrowser = async () => {
-  const browser = await puppeteer.launch();
+  console.log('Setting up puppeteer')
+  browser = await puppeteer.launch();
+}
+
+// Hacky Target Alert
+const fetchTarget = async () => {
+  console.log('Fetching target page')
   const page = await browser.newPage();
   await page.goto(targetURL);
 
@@ -16,13 +22,24 @@ const setupBrowser = async () => {
   await page.waitForTimeout(3000);
   const html = await page.evaluate(() => document.querySelector('*').outerHTML);
   console.log(html)
-
-  await browser.close();
 }
 
 cron.schedule('*/30 * * * * *', async () => {
-    console.log('test');
-    await setupBrowser();
+    console.log('Cron job started', new Date(Date.now()));
+    if (!browser) {
+      await setupBrowser();
+    }
+    await fetchTarget();
 });
   
-app.listen(3000);
+const server = app.listen(3000);
+
+const shutDown = () => {
+  console.log('Shutting down server');
+  server.close(() => {
+      process.exit(0);
+  });
+}
+
+process.on('SIGTERM', shutDown);
+process.on('SIGINT', shutDown);
