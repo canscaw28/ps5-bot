@@ -102,6 +102,8 @@ app.get('/test', async (req, res) => {
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
+console.log(`Server is listening at port ${port}`)
+console.log(`The following phone numbers will be alerted: ${phoneNumbers}`)
 
 const shutDown = () => {
   console.log('Shutting down server');
