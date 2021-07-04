@@ -3,6 +3,7 @@ import express from 'express';
 import puppeteer from 'puppeteer';
 import dotenv from 'dotenv';
 import twilio from 'twilio';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 
 dotenv.config();
@@ -10,27 +11,36 @@ dotenv.config();
 const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const personalPhoneNumbers = _.split(process.env.PERSONAL_PHONE_NUMBERS, ',');
+const personalPhoneNumbers = process.env.PERSONAL_PHONE_NUMBERS.split(',');
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const twilioClient = twilio(accountSid, authToken);
 const app = express();
 let cooldown = 0;
 
-const logger = (message) => {
-  console.log(new Date(Date.now()), message)
+class Logger {
+  constructor() {
+    this.id = uuidv4();
+  }
+
+  log = (message) => {
+    console.log(new Date(Date.now()), this.id, message)
+  }
 }
 
-const triggerAlert = async () => {
+
+const triggerAlert = async (logger) => {
+  console.log(personalPhoneNumbers, process.env.PERSONAL_PHONE_NUMBERS)
   _.forEach(personalPhoneNumbers, number => {
+    logger.log(`Sending alert to ${number}`);
     twilioClient.messages
       .create({body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: number})
       .then(message => console.log(message.sid));
   });
 }
 
-const setupBrowser = async () => {
-  logger('Setting up puppeteer');
+const setupBrowser = async (logger) => {
+  logger.log('Setting up puppeteer');
   return puppeteer.launch({
     args: [
       '--no-sandbox',
@@ -40,8 +50,8 @@ const setupBrowser = async () => {
 }
 
 // Hacky Target Alert
-const fetchTarget = async (browser) => {
-  logger('Fetching target page');
+const fetchTarget = async (logger, browser) => {
+  logger.log('Fetching target page');
   const page = await browser.newPage();
   await page.goto(targetURL);
 
@@ -51,36 +61,39 @@ const fetchTarget = async (browser) => {
   if (element) {
     const value = await page.evaluate(el => el.textContent, element);
     if (value === 'Sold out') {
-      logger('Product is Sold out.')
+      logger.log('Product is Sold out.')
       return;
     }
   }
 
-  logger('Product is in stock!')
+  logger.log('Product is in stock!')
   cooldown = 10;
   await triggerAlert();
 }
 
 cron.schedule('*/30 * * * * *', async () => {
-  logger('Cron job started');
-  const browser = await setupBrowser();
+  const logger = new Logger();
+  logger.log('Cron job started');
+  const browser = await setupBrowser(logger);
 
   if (cooldown > 0) {
     cooldown--;
+    logger.log(`Cron is cooling down. Count: ${cooldown}`);
     return;
   }
 
-  await fetchTarget(browser);
+  await fetchTarget(logger, browser);
 
   browser.close();
-  logger('~ Job Finished ~')
+  logger.log('~ Job Finished ~')
+  console.log();
 });
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
 
 const shutDown = () => {
-  logger('Shutting down server');
+  console.log('Shutting down server');
   server.close(() => {
       process.exit(0);
   });
