@@ -15,7 +15,6 @@ const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const twilioClient = twilio(accountSid, authToken);
 const app = express();
-let browser = null;
 let cooldown = 0;
 
 const logger = (message) => {
@@ -32,7 +31,7 @@ const triggerAlert = async () => {
 
 const setupBrowser = async () => {
   logger('Setting up puppeteer');
-  browser = await puppeteer.launch({
+  return puppeteer.launch({
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -41,7 +40,7 @@ const setupBrowser = async () => {
 }
 
 // Hacky Target Alert
-const fetchTarget = async () => {
+const fetchTarget = async (browser) => {
   logger('Fetching target page');
   const page = await browser.newPage();
   await page.goto(targetURL);
@@ -64,16 +63,17 @@ const fetchTarget = async () => {
 
 cron.schedule('*/30 * * * * *', async () => {
   logger('Cron job started');
-    if (!browser) {
-      await setupBrowser();
-    }
+  const browser = await setupBrowser();
 
-    if (cooldown > 0) {
-      cooldown--;
-      return;
-    }
+  if (cooldown > 0) {
+    cooldown--;
+    return;
+  }
 
-    await fetchTarget();
+  await fetchTarget(browser);
+
+  browser.close();
+  logger('~ Job Finished ~')
 });
 
 const port = process.env.PORT || 3000;
