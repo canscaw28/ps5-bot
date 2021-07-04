@@ -4,11 +4,12 @@ import puppeteer from 'puppeteer';
 import dotenv from 'dotenv';
 import twilio from 'twilio';
 import { v4 as uuidv4 } from 'uuid';
+import Promise from 'bluebird';
 import _ from 'lodash';
 
 dotenv.config();
 
-if (!_.includes(Object.keys(process.env), ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'PHONE_NUMBERS', 'TWILIO_PHONE_NUMBER'])) {
+if (!_.every(['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'PHONE_NUMBERS', 'TWILIO_PHONE_NUMBER'], key => _.includes(Object.keys(process.env), key))) {
   console.log('Your .env file is incorrectly configured.')
   process.exit(1);
 }
@@ -35,11 +36,12 @@ class Logger {
 
 
 const triggerAlert = async (logger) => {
-  _.forEach(phoneNumbers, number => {
+  await Promise.map(phoneNumbers, async (number) => {
     logger.log(`Sending alert to ${number}`);
-    twilioClient.messages
+    const res = await twilioClient.messages
       .create({body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: number})
       .then(message => console.log(message.sid));
+    console.log(res)
   });
 }
 
