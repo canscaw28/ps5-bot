@@ -19,7 +19,7 @@ const app = express();
 let cooldown = 0;
 
 class Logger {
-  logger() {
+  constructor() {
     this.id = uuidv4();
   }
 
@@ -37,8 +37,8 @@ const triggerAlert = async () => {
   });
 }
 
-const setupBrowser = async () => {
-  logger('Setting up puppeteer');
+const setupBrowser = async (logger) => {
+  logger.log('Setting up puppeteer');
   return puppeteer.launch({
     args: [
       '--no-sandbox',
@@ -72,7 +72,7 @@ const fetchTarget = async (logger, browser) => {
 cron.schedule('*/30 * * * * *', async () => {
   const logger = new Logger();
   logger.log('Cron job started');
-  const browser = await setupBrowser();
+  const browser = await setupBrowser(logger);
 
   if (cooldown > 0) {
     cooldown--;
@@ -82,7 +82,8 @@ cron.schedule('*/30 * * * * *', async () => {
   await fetchTarget(logger, browser);
 
   browser.close();
-  logger.log('~ Job Finished ~\n')
+  logger.log('~ Job Finished ~')
+  console.log();
 });
 
 const port = process.env.PORT || 3000;
