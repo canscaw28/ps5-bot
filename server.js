@@ -72,7 +72,7 @@ cron.schedule('*/30 * * * * *', async () => {
     await fetchTarget();
 });
 
-const port = process.env.PORT | 3000;
+const port = process.env.PORT || 3000;
 const server = app.listen(port);
 
 const shutDown = () => {
