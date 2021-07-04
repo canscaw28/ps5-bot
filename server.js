@@ -83,7 +83,7 @@ cron.schedule('*/30 * * * * *', async () => {
 
   browser.close();
   logger.log('~ Job Finished ~')
-  console.log();
+  console.log('');
 });
 
 const port = process.env.PORT || 3000;
