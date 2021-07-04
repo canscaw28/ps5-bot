@@ -17,9 +17,16 @@ const twilioClient = twilio(accountSid, authToken);
 const app = express();
 let cooldown = 0;
 
-const logger = (message) => {
-  console.log(new Date(Date.now()), message)
+class Logger {
+  logger() {
+    this.id = uuidv4();
+  }
+
+  log = (message) => {
+    console.log(new Date(Date.now()), this.id, message)
+  }
 }
+
 
 const triggerAlert = async () => {
   _.forEach(personalPhoneNumbers, number => {
@@ -40,8 +47,8 @@ const setupBrowser = async () => {
 }
 
 // Hacky Target Alert
-const fetchTarget = async (browser) => {
-  logger('Fetching target page');
+const fetchTarget = async (logger, browser) => {
+  logger.log('Fetching target page');
   const page = await browser.newPage();
   await page.goto(targetURL);
 
@@ -51,18 +58,19 @@ const fetchTarget = async (browser) => {
   if (element) {
     const value = await page.evaluate(el => el.textContent, element);
     if (value === 'Sold out') {
-      logger('Product is Sold out.')
+      logger.log('Product is Sold out.')
       return;
     }
   }
 
-  logger('Product is in stock!')
+  logger.log('Product is in stock!')
   cooldown = 10;
   await triggerAlert();
 }
 
 cron.schedule('*/30 * * * * *', async () => {
-  logger('Cron job started');
+  const logger = new Logger();
+  logger.log('Cron job started');
   const browser = await setupBrowser();
 
   if (cooldown > 0) {
@@ -70,17 +78,17 @@ cron.schedule('*/30 * * * * *', async () => {
     return;
   }
 
-  await fetchTarget(browser);
+  await fetchTarget(logger, browser);
 
   browser.close();
-  logger('~ Job Finished ~')
+  logger.log('~ Job Finished ~\n')
 });
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
 
 const shutDown = () => {
-  logger('Shutting down server');
+  console.log('Shutting down server');
   server.close(() => {
       process.exit(0);
   });
