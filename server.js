@@ -11,7 +11,7 @@ dotenv.config();
 const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const personalPhoneNumbers = _.split(process.env.PERSONAL_PHONE_NUMBERS, ',');
+const personalPhoneNumbers = process.env.PERSONAL_PHONE_NUMBERS.split(',');
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const twilioClient = twilio(accountSid, authToken);
@@ -29,8 +29,14 @@ class Logger {
 }
 
 
+<<<<<<< HEAD
 const triggerAlert = async () => {
+=======
+const triggerAlert = async (logger) => {
+  console.log(personalPhoneNumbers, process.env.PERSONAL_PHONE_NUMBERS)
+>>>>>>> 8c7f4b3b90fa3463a0662813e04f467728746304
   _.forEach(personalPhoneNumbers, number => {
+    logger.log(`Sending alert to ${number}`);
     twilioClient.messages
       .create({body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: number})
       .then(message => console.log(message.sid));
@@ -84,7 +90,11 @@ cron.schedule('*/30 * * * * *', async () => {
 
   browser.close();
   logger.log('~ Job Finished ~')
+<<<<<<< HEAD
   console.log('');
+=======
+  console.log();
+>>>>>>> 8c7f4b3b90fa3463a0662813e04f467728746304
 });
 
 const port = process.env.PORT || 3000;
