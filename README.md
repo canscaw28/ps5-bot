@@ -17,7 +17,7 @@ Create a `.env` file with the following values:
 TWILIO_AUTH_TOKEN="[Your twilio auth token]"
 TWILIO_ACCOUNT_SID="[your twilio account sid]"
 TWILIO_PHONE_NUMBER="[A designated twilio phone number]"
-PERSONAL_PHONE_NUMBER="[the recipient phone number of the alert]"
+PHONE_NUMBERS="[comma delimited list of phone numbers to alert]"
 ```
 
 To run the server:
