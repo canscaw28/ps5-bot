@@ -8,10 +8,15 @@ import _ from 'lodash';
 
 dotenv.config();
 
+if (!_.includes(Object.keys(process.env), ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'PHONE_NUMBERS', 'TWILIO_PHONE_NUMBER'])) {
+  console.log('Your .env file is incorrectly configured.')
+  process.exit(1);
+}
+
 const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const personalPhoneNumbers = process.env.PERSONAL_PHONE_NUMBERS.split(',');
+const phoneNumbers = process.env.PHONE_NUMBERS.split(',');
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const twilioClient = twilio(accountSid, authToken);
@@ -30,7 +35,7 @@ class Logger {
 
 
 const triggerAlert = async (logger) => {
-  _.forEach(personalPhoneNumbers, number => {
+  _.forEach(phoneNumbers, number => {
     logger.log(`Sending alert to ${number}`);
     twilioClient.messages
       .create({body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: number})
@@ -87,6 +92,11 @@ cron.schedule('*/30 * * * * *', async () => {
   logger.log('~ Job Finished ~')
   console.log('');
 });
+
+// Test Twillio Alert
+app.get('/test', async (req, res) => {
+  await triggerAlert(new Logger());
+})
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
