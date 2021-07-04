@@ -15,8 +15,18 @@ const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const twilioClient = twilio(accountSid, authToken);
 const app = express();
-let browser = null;
 let cooldown = 0;
+
+class Logger {
+  logger() {
+    this.id = uuidv4();
+  }
+
+  log = (message) => {
+    console.log(new Date(Date.now()), this.id, message)
+  }
+}
+
 
 const triggerAlert = async () => {
   _.forEach(personalPhoneNumbers, number => {
@@ -27,8 +37,8 @@ const triggerAlert = async () => {
 }
 
 const setupBrowser = async () => {
-  console.log('Setting up puppeteer')
-  browser = await puppeteer.launch({
+  logger('Setting up puppeteer');
+  return puppeteer.launch({
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -37,8 +47,8 @@ const setupBrowser = async () => {
 }
 
 // Hacky Target Alert
-const fetchTarget = async () => {
-  console.log('Fetching target page')
+const fetchTarget = async (logger, browser) => {
+  logger.log('Fetching target page');
   const page = await browser.newPage();
   await page.goto(targetURL);
 
@@ -48,28 +58,30 @@ const fetchTarget = async () => {
   if (element) {
     const value = await page.evaluate(el => el.textContent, element);
     if (value === 'Sold out') {
-      console.log('Product is Sold out.')
+      logger.log('Product is Sold out.')
       return;
     }
   }
 
-  console.log('Product is in stock!')
+  logger.log('Product is in stock!')
   cooldown = 10;
   await triggerAlert();
 }
 
 cron.schedule('*/30 * * * * *', async () => {
-    console.log('Cron job started', new Date(Date.now()));
-    if (!browser) {
-      await setupBrowser();
-    }
+  const logger = new Logger();
+  logger.log('Cron job started');
+  const browser = await setupBrowser();
 
-    if (cooldown > 0) {
-      cooldown--;
-      return;
-    }
+  if (cooldown > 0) {
+    cooldown--;
+    return;
+  }
 
-    await fetchTarget();
+  await fetchTarget(logger, browser);
+
+  browser.close();
+  logger.log('~ Job Finished ~\n')
 });
 
 const port = process.env.PORT || 3000;
