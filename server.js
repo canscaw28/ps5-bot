@@ -60,7 +60,6 @@ const fetchTarget = async (logger, browser) => {
     const value = await page.evaluate(el => el.textContent, element);
     if (value === 'Sold out') {
       logger.log('Product is Sold out.')
-      cooldown = 10;
       return;
     }
   }
