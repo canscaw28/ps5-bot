@@ -15,19 +15,22 @@ const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 const twilioClient = twilio(accountSid, authToken);
 const app = express();
 let browser = null;
-
-// Hacky cooldown - so I don't get spammed.
 let cooldown = 0;
 
 const triggerAlert = async () => {
   twilioClient.messages
-      .create({body: `PS5 ALERT!!! visit ${targetURL}`, from: twilioPhoneNumber, to: personalPhoneNumber})
+      .create({body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: personalPhoneNumber})
       .then(message => console.log(message.sid));
 }
 
 const setupBrowser = async () => {
   console.log('Setting up puppeteer')
-  browser = await puppeteer.launch();
+  browser = await puppeteer.launch({
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+    ],
+  });
 }
 
 // Hacky Target Alert
@@ -58,7 +61,6 @@ cron.schedule('*/30 * * * * *', async () => {
       await setupBrowser();
     }
 
-    // delay consecutive alerting.
     if (cooldown > 0) {
       cooldown--;
       return;
@@ -66,8 +68,9 @@ cron.schedule('*/30 * * * * *', async () => {
 
     await fetchTarget();
 });
-  
-const server = app.listen(3000);
+
+const port = process.env.PORT | 3000;
+const server = app.listen(port);
 
 const shutDown = () => {
   console.log('Shutting down server');
