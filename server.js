@@ -3,6 +3,7 @@ import express from 'express';
 import puppeteer from 'puppeteer';
 import dotenv from 'dotenv';
 import twilio from 'twilio';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 
 dotenv.config();
