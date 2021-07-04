@@ -18,6 +18,10 @@ const app = express();
 let browser = null;
 let cooldown = 0;
 
+const logger = (message) => {
+  console.log(new Date(Date.now()), message)
+}
+
 const triggerAlert = async () => {
   _.forEach(personalPhoneNumbers, number => {
     twilioClient.messages
@@ -27,7 +31,7 @@ const triggerAlert = async () => {
 }
 
 const setupBrowser = async () => {
-  console.log('Setting up puppeteer')
+  logger('Setting up puppeteer');
   browser = await puppeteer.launch({
     args: [
       '--no-sandbox',
@@ -38,7 +42,7 @@ const setupBrowser = async () => {
 
 // Hacky Target Alert
 const fetchTarget = async () => {
-  console.log('Fetching target page')
+  logger('Fetching target page');
   const page = await browser.newPage();
   await page.goto(targetURL);
 
@@ -48,18 +52,18 @@ const fetchTarget = async () => {
   if (element) {
     const value = await page.evaluate(el => el.textContent, element);
     if (value === 'Sold out') {
-      console.log('Product is Sold out.')
+      logger('Product is Sold out.')
       return;
     }
   }
 
-  console.log('Product is in stock!')
+  logger('Product is in stock!')
   cooldown = 10;
   await triggerAlert();
 }
 
 cron.schedule('*/30 * * * * *', async () => {
-    console.log('Cron job started', new Date(Date.now()));
+  logger('Cron job started');
     if (!browser) {
       await setupBrowser();
     }
@@ -76,7 +80,7 @@ const port = process.env.PORT || 3000;
 const server = app.listen(port);
 
 const shutDown = () => {
-  console.log('Shutting down server');
+  logger('Shutting down server');
   server.close(() => {
       process.exit(0);
   });
