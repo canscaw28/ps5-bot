@@ -2,7 +2,7 @@
   "name": "ps5-bot",
   "version": "1.0.0",
   "description": "ps5 alerting",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "test",
     "lint": "yarn run eslint --fix ."
