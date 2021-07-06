@@ -1,8 +1,7 @@
 import twilio from 'twilio';
 import Promise from 'bluebird';
 import env from './env';
-
-const targetURL = 'https://www.target.com/p/playstation-5-console/-/A-81114595';
+import { targetURL } from './defaults';
 
 export const setupTwilioClient = () =>
   twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);

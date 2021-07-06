@@ -10,6 +10,8 @@
   },
   "plugins": ["prettier"],
   "rules": {
+    "import/prefer-default-export": "off",
+    "no-param-reassign": "off",
     "prettier/prettier": "error",
     "no-console": "off",
     "no-plusplus": "off"
