@@ -34,6 +34,7 @@
     "@types/bluebird": "^3.5.35",
     "@types/bluebird-global": "^3.5.12",
     "@types/express": "^4.17.12",
+    "@types/lodash": "^4.14.170",
     "@types/node": "^16.0.0",
     "@types/node-cron": "^2.0.3",
     "@types/uuid": "^8.3.1",

@@ -7,6 +7,7 @@ export const setupTwilioClient = (): Twilio =>
   twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
 export const sendTextAlert = async (
+  retailer: Retailers,
   client: Twilio,
   logger: Logger
 ): Promise<void> => {
@@ -14,8 +15,8 @@ export const sendTextAlert = async (
     logger.log(`Sending alert to ${number}`);
     const res = await client.messages
       .create({
-        body: `PS5 ALERT!!! visit the following link ASAP: ${
-          retailSites[Retailers.Target]
+        body: `${retailer} PS5 ALERT!!! visit the following link ASAP: ${
+          retailSites[retailer].url
         }`,
         from: env.TWILIO_PHONE_NUMBER,
         to: number,

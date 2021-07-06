@@ -5,6 +5,7 @@ import env from './env';
 import setupRoutes from './routes';
 import { setupTwilioClient } from './alert';
 import { CooldownMap, Retailers } from './defaults';
+import _ from 'lodash';
 
 import { inspectionJob } from './inspect';
 
@@ -16,7 +17,12 @@ const twilioClient = setupTwilioClient();
 setupRoutes(app, twilioClient);
 
 const cooldownMap: CooldownMap = {
-  target: 0,
+  [Retailers.Target]: 0,
+  [Retailers.BestBuy]: 0,
+  [Retailers.GameStop]: 0,
+  [Retailers.Walmart]: 0,
+  [Retailers.Costco]: 0,
+  [Retailers.Sony]: 0,
 };
 
 const scheduleCron = (cronSchedule: string, retialer: Retailers) => {
@@ -27,7 +33,8 @@ const scheduleCron = (cronSchedule: string, retialer: Retailers) => {
   );
 };
 
-scheduleCron('*/30 * * * * *', Retailers.Target);
+// Schedule crons for each retailer
+_.forEach(Retailers, retailer => scheduleCron('*/30 * * * * *', retailer));
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);

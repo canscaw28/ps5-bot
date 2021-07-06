@@ -36,7 +36,7 @@ const inspectRetailer = async ({
   const element = await page.$(retailerParams.selector);
   if (element) {
     const value = await page.evaluate((el) => el.textContent, element);
-    if (value === retailerParams.value) {
+    if (value === retailerParams.value || (retailerParams.fn && retailerParams.fn(value))) {
       logger.log(`Product is Sold out at ${retailer}`);
       return;
     }
@@ -44,7 +44,7 @@ const inspectRetailer = async ({
 
   logger.log('Product is in stock!');
   cooldownMap[retailer] = 10;
-  await sendTextAlert(twilioClient, logger);
+  await sendTextAlert(retailer, twilioClient, logger);
 };
 
 export const inspectionJob = async (
