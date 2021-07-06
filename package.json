@@ -6,9 +6,9 @@
   "scripts": {
     "test": "test",
     "lint": "yarn run eslint --fix .",
-    "start": "node src/server.js"
+    "start": "nodemon src/server.ts",
+    "build": "tsc --project ./"
   },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/canscaw28/ps5-bot.git"
@@ -31,11 +31,16 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/node": "^16.0.0",
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-prettier": "^3.4.0",
-    "prettier": "^2.3.2"
+    "nodemon": "^2.0.9",
+    "prettier": "^2.3.2",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
   }
 }

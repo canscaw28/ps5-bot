@@ -1,6 +1,9 @@
-import envalid, { str } from 'envalid';
+import dotenv from 'dotenv';
+import { cleanEnv, str } from 'envalid';
 
-const env = envalid.cleanEnv(process.env, {
+dotenv.config();
+
+const env = cleanEnv(process.env, {
   TWILIO_ACCOUNT_SID: str(),
   TWILIO_AUTH_TOKEN: str(),
   TWILIO_PHONE_NUMBER: str(),
