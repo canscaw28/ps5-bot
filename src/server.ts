@@ -1,12 +1,17 @@
 import express from 'express';
+import * as Promise from 'bluebird';
 import env from './env';
 import scheduleCrons from './crons';
 import setupRoutes from './routes';
+import { setupTwilioClient } from './alert';
+
+global.Promise = <any>Promise;
 
 const app = express();
+const twilioClient = setupTwilioClient();
 
-scheduleCrons();
-setupRoutes(app);
+scheduleCrons(twilioClient);
+setupRoutes(app, twilioClient);
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);

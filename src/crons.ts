@@ -1,13 +1,12 @@
 import cron from 'node-cron';
-import { setupTwilioClient } from './alert';
+import { Twilio } from 'twilio';
 import { inspectTarget } from './inspect';
 
-const twilioClient = setupTwilioClient();
 const cooldownMap = {
   target: 0,
 };
 
-const scheduleCrons = () => {
+const scheduleCrons = (twilioClient: Twilio): void => {
   cron.schedule('*/30 * * * * *', async () =>
     inspectTarget(twilioClient, cooldownMap)
   );

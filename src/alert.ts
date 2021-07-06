@@ -1,17 +1,22 @@
-import twilio from 'twilio';
-import Promise from 'bluebird';
+import twilio, { Twilio } from 'twilio';
 import env from './env';
-import { targetURL } from './defaults';
+import { Retailers, retailSites } from './defaults';
+import Logger from './logger';
 
-export const setupTwilioClient = () =>
+export const setupTwilioClient = (): Twilio =>
   twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
-export const sendTextAlert = async (client, logger) => {
+export const sendTextAlert = async (
+  client: Twilio,
+  logger: Logger
+): Promise<void> => {
   await Promise.map(env.PHONE_NUMBERS.split(','), async (number) => {
     logger.log(`Sending alert to ${number}`);
     const res = await client.messages
       .create({
-        body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`,
+        body: `PS5 ALERT!!! visit the following link ASAP: ${
+          retailSites[Retailers.Target]
+        }`,
         from: env.TWILIO_PHONE_NUMBER,
         to: number,
       })

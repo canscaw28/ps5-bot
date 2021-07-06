@@ -1,9 +1,10 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { Browser } from 'puppeteer';
+import { Twilio } from 'twilio';
 import Logger from './logger';
 import { sendTextAlert } from './alert';
-import { targetURL } from './defaults';
+import { CooldownMap, Retailers, retailSites } from './defaults';
 
-const setupBrowser = async (logger) => {
+const setupBrowser = async (logger: Logger) => {
   logger.log('Setting up puppeteer');
   return puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -11,10 +12,15 @@ const setupBrowser = async (logger) => {
 };
 
 // Hacky Target Alert
-const fetchTarget = async (logger, browser, twilioClient, cooldownMap) => {
+const fetchTarget = async (
+  logger: Logger,
+  browser: Browser,
+  twilioClient: Twilio,
+  cooldownMap: CooldownMap
+) => {
   logger.log('Fetching target page');
   const page = await browser.newPage();
-  await page.goto(targetURL);
+  await page.goto(retailSites[Retailers.Target]);
 
   // Wait for page content to load
   await page.waitForTimeout(3000);
@@ -32,7 +38,10 @@ const fetchTarget = async (logger, browser, twilioClient, cooldownMap) => {
   await sendTextAlert(twilioClient, logger);
 };
 
-export const inspectTarget = async (twilioClient, cooldownMap) => {
+export const inspectTarget = async (
+  twilioClient: Twilio,
+  cooldownMap: CooldownMap
+): Promise<void> => {
   const logger = new Logger();
   logger.log('Cron job started');
   const browser = await setupBrowser(logger);
