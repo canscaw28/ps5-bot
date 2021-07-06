@@ -34,9 +34,8 @@ const scheduleCron = (cronSchedule: string, retialer: Retailers) => {
 };
 
 // Schedule crons for each retailer
-// _.forEach(Retailers, retailer => scheduleCron('*/30 * * * * *', retailer));
+_.forEach(Retailers, retailer => scheduleCron('*/30 * * * * *', retailer));
 
-scheduleCron('*/30 * * * * *', Retailers.Target);
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
 console.log(`Server is listening at port ${port}`);
