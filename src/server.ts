@@ -1,11 +1,11 @@
 import express from 'express';
 import { schedule } from 'node-cron';
 import bluebird from 'bluebird';
+import _ from 'lodash';
 import env from './env';
 import setupRoutes from './routes';
 import { setupTwilioClient } from './alert';
 import { CooldownMap, Retailers } from './defaults';
-import _ from 'lodash';
 
 import { inspectionJob } from './inspect';
 
@@ -34,7 +34,7 @@ const scheduleCron = (cronSchedule: string, retialer: Retailers) => {
 };
 
 // Schedule crons for each retailer
-_.forEach(Retailers, retailer => scheduleCron('*/30 * * * * *', retailer));
+_.forEach(Retailers, (retailer) => scheduleCron('*/30 * * * * *', retailer));
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
