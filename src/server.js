@@ -1,6 +1,6 @@
 import express from 'express';
 import env from './env';
-import scheduleCrons from './cons';
+import scheduleCrons from './crons';
 import setupRoutes from './routes';
 
 const app = express();
