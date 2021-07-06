@@ -4,7 +4,8 @@
   "description": "ps5 alerting",
   "main": "server.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "lint": "yarn run eslint --fix ."
   },
   "type": "module",
   "repository": {
@@ -26,5 +27,10 @@
     "puppeteer": "^10.1.0",
     "twilio": "^3.65.0",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4"
   }
 }

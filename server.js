@@ -9,8 +9,8 @@ import _ from 'lodash';
 
 dotenv.config();
 
-if (!_.every(['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'PHONE_NUMBERS', 'TWILIO_PHONE_NUMBER'], key => _.includes(Object.keys(process.env), key))) {
-  console.log('Your .env file is incorrectly configured.')
+if (!_.every(['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'PHONE_NUMBERS', 'TWILIO_PHONE_NUMBER'], (key) => _.includes(Object.keys(process.env), key))) {
+  console.log('Your .env file is incorrectly configured.');
   process.exit(1);
 }
 
@@ -29,21 +29,20 @@ class Logger {
     this.id = uuidv4();
   }
 
-  log = (message) => {
-    console.log(new Date(Date.now()), this.id, message)
+  log(message) {
+    console.log(new Date(Date.now()), this.id, message);
   }
 }
-
 
 const triggerAlert = async (logger) => {
   await Promise.map(phoneNumbers, async (number) => {
     logger.log(`Sending alert to ${number}`);
     const res = await twilioClient.messages
-      .create({body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: number})
-      .then(message => console.log(message.sid));
-    console.log(res)
+      .create({ body: `PS5 ALERT!!! visit the following link ASAP: ${targetURL}`, from: twilioPhoneNumber, to: number })
+      .then((message) => console.log(message.sid));
+    console.log(res);
   });
-}
+};
 
 const setupBrowser = async (logger) => {
   logger.log('Setting up puppeteer');
@@ -53,7 +52,7 @@ const setupBrowser = async (logger) => {
       '--disable-setuid-sandbox',
     ],
   });
-}
+};
 
 // Hacky Target Alert
 const fetchTarget = async (logger, browser) => {
@@ -65,17 +64,17 @@ const fetchTarget = async (logger, browser) => {
   await page.waitForTimeout(3000);
   const element = await page.$('[data-test="soldOutBlock"]');
   if (element) {
-    const value = await page.evaluate(el => el.textContent, element);
+    const value = await page.evaluate((el) => el.textContent, element);
     if (value === 'Sold out') {
-      logger.log('Product is Sold out.')
+      logger.log('Product is Sold out.');
       return;
     }
   }
 
-  logger.log('Product is in stock!')
+  logger.log('Product is in stock!');
   cooldown = 10;
   await triggerAlert();
-}
+};
 
 cron.schedule('*/30 * * * * *', async () => {
   const logger = new Logger();
@@ -91,26 +90,26 @@ cron.schedule('*/30 * * * * *', async () => {
   await fetchTarget(logger, browser);
 
   browser.close();
-  logger.log('~ Job Finished ~')
+  logger.log('~ Job Finished ~');
   console.log('');
 });
 
 // Test Twillio Alert
-app.get('/test', async (req, res) => {
+app.get('/test', async () => {
   await triggerAlert(new Logger());
-})
+});
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
-console.log(`Server is listening at port ${port}`)
-console.log(`The following phone numbers will be alerted: ${phoneNumbers}`)
+console.log(`Server is listening at port ${port}`);
+console.log(`The following phone numbers will be alerted: ${phoneNumbers}`);
 
 const shutDown = () => {
   console.log('Shutting down server');
   server.close(() => {
-      process.exit(0);
+    process.exit(0);
   });
-}
+};
 
 process.on('SIGTERM', shutDown);
 process.on('SIGINT', shutDown);
