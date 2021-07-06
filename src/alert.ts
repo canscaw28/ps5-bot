@@ -1,6 +1,6 @@
 import twilio, { Twilio } from 'twilio';
 import env from './env';
-import { Retailers, retailSites } from './defaults';
+import { Retailers, retailerParams } from './defaults';
 import Logger from './logger';
 
 export const setupTwilioClient = (): Twilio =>
@@ -16,12 +16,11 @@ export const sendTextAlert = async (
     const res = await client.messages
       .create({
         body: `${retailer} PS5 ALERT!!! visit the following link ASAP: ${
-          retailSites[retailer].url
+          retailerParams[retailer].url
         }`,
         from: env.TWILIO_PHONE_NUMBER,
         to: number,
       })
       .then((message) => console.log(message.sid));
-    console.log(res);
   });
 };
