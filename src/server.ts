@@ -1,17 +1,33 @@
 import express from 'express';
-import * as Promise from 'bluebird';
+import { schedule } from 'node-cron';
+import bluebird from 'bluebird';
 import env from './env';
-import scheduleCrons from './crons';
 import setupRoutes from './routes';
 import { setupTwilioClient } from './alert';
+import { CooldownMap, Retailers } from './defaults';
 
-global.Promise = <any>Promise;
+import { inspectionJob } from './inspect';
+
+global.Promise = <any>bluebird;
 
 const app = express();
 const twilioClient = setupTwilioClient();
 
-scheduleCrons(twilioClient);
 setupRoutes(app, twilioClient);
+
+const cooldownMap: CooldownMap = {
+  target: 0,
+};
+
+const scheduleCron = (cronSchedule: string, retialer: Retailers) => {
+  schedule(
+    cronSchedule,
+    () => inspectionJob(retialer, twilioClient, cooldownMap),
+    { timezone: 'America/Los_Angeles' }
+  );
+};
+
+scheduleCron('*/30 * * * * *', Retailers.Target);
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);

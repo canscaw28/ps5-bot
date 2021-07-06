@@ -11,48 +11,66 @@ const setupBrowser = async (logger: Logger) => {
   });
 };
 
-// Hacky Target Alert
-const fetchTarget = async (
-  logger: Logger,
-  browser: Browser,
-  twilioClient: Twilio,
-  cooldownMap: CooldownMap
-) => {
-  logger.log('Fetching target page');
+interface InspectRetailer {
+  retailer: Retailers;
+  logger: Logger;
+  browser: Browser;
+  twilioClient: Twilio;
+  cooldownMap: CooldownMap;
+}
+
+const inspectRetailer = async ({
+  retailer,
+  logger,
+  browser,
+  twilioClient,
+  cooldownMap,
+}: InspectRetailer): Promise<void> => {
+  logger.log(`Fetching page from ${retailer}`);
+  const retailerParams = retailSites[retailer];
   const page = await browser.newPage();
-  await page.goto(retailSites[Retailers.Target]);
+  await page.goto(retailerParams.url);
 
   // Wait for page content to load
   await page.waitForTimeout(3000);
-  const element = await page.$('[data-test="soldOutBlock"]');
+  const element = await page.$(retailerParams.selector);
   if (element) {
     const value = await page.evaluate((el) => el.textContent, element);
-    if (value === 'Sold out') {
-      logger.log('Product is Sold out.');
+    if (value === retailerParams.value) {
+      logger.log(`Product is Sold out at ${retailer}`);
       return;
     }
   }
 
   logger.log('Product is in stock!');
-  cooldownMap.target = 10;
+  cooldownMap[retailer] = 10;
   await sendTextAlert(twilioClient, logger);
 };
 
-export const inspectTarget = async (
+export const inspectionJob = async (
+  retailer: Retailers,
   twilioClient: Twilio,
   cooldownMap: CooldownMap
 ): Promise<void> => {
-  const logger = new Logger();
-  logger.log('Cron job started');
+  const logger = new Logger(retailer);
+  logger.log(`Cron job started for retailer: ${retailer}`);
   const browser = await setupBrowser(logger);
 
-  if (cooldownMap.target > 0) {
-    cooldownMap.target--;
-    logger.log(`Cron is cooling down. Count: ${cooldownMap.target}`);
+  if (cooldownMap[retailer] > 0) {
+    cooldownMap[retailer]--;
+    logger.log(
+      `${Retailers} cron is cooling down. Count: ${cooldownMap[retailer]}`
+    );
     return;
   }
 
-  await fetchTarget(logger, browser, twilioClient, cooldownMap);
+  await inspectRetailer({
+    retailer,
+    logger,
+    browser,
+    twilioClient,
+    cooldownMap,
+  });
 
   browser.close();
   logger.log('~ Job Finished ~');
