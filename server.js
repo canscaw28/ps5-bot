@@ -27,10 +27,7 @@ class Logger {
 const setupBrowser = async (logger) => {
   logger.log('Setting up puppeteer');
   return puppeteer.launch({
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-    ],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 };
 
@@ -82,7 +79,9 @@ app.get('/test', async () => {
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
 console.log(`Server is listening at port ${port}`);
-console.log(`The following phone numbers will be alerted: ${env.PHONE_NUMBERS}`);
+console.log(
+  `The following phone numbers will be alerted: ${env.PHONE_NUMBERS}`
+);
 
 const shutDown = () => {
   console.log('Shutting down server');
